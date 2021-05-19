@@ -138,7 +138,7 @@ function postNode(){
 		errorElem="";
 	}
 	if(options.url_ref!=undefined){
-		urlref=options.url_ref+(options.url_ref+"").trim();
+		urlref=(options.url_ref+"").trim();
     } else {
     	urlref=(lasturlref+"").trim();
     }
@@ -161,6 +161,7 @@ function postNode(){
 		}
 		if (urlparams!=undefined){
 			Object.keys(urlparams).forEach(function(key) {
+				
 				if(Array.isArray(urlparams[key])){
 					urlparams[key].forEach(function(val){
 						if(hasJson) {
@@ -173,6 +174,7 @@ function postNode(){
 						}
 					});
 				} else {
+					
 					if(hasJson) {
 						if (formData["reqst-params"][fname]==undefined){
 							formData["reqst-params"][fname]=[];
@@ -287,7 +289,7 @@ function postNode(){
 					if(options.scriptlabel!=undefined&&(options.scriptlabel!="")!==""){
 						scriptlabel=(options.scriptlabel!="");
 					}
-
+	
 					if (responseFunc!=null) {
 						if(options.replacelabel==undefined){
 							options.replacelabel=replacelabel;
@@ -363,13 +365,20 @@ function defaultResponseCall(){
 	var args=[].slice.call(arguments);
 	//"ajax",options,response,textStatus,xhr
 	if (args.length>=4) {
+		
 		var options=args[1];
-		var scriptlablel=options.scriptlabel+"";
+		var target="";
+		if (options.target!==undefined) {
+			target=options.target+"";
+			
+		}
+		var scriptlabel=options.scriptlabel+"";
 		var replacelabel=options.replacelabel+"";
 		var response=args[2];
 		var parsed=parseActiveString(`${scriptlabel}||`,`||${scriptlabel}`,response);
 		var parsedScript=parsed[1].join("");
 		response=parsed[0].trim();
+		
 		var targets=[];
 		var targetSections=[];
 		
@@ -383,10 +392,19 @@ function defaultResponseCall(){
 					}        				
 				});
 			}
-			targets.unshift([target,response]);
+		}
+		if  (target!=="" && response!==""){
+			if (target.startsWith("#")) {
+				$(target).html(response);
+			} else {
+				$(target).each(function(i){
+					$(this).html(response)
+				});
+			}
 		}
 		if(targets.length>0){
 			targets.forEach(function(targetSec){
+				alert(targetSec[0]);
 				if ($(targetSec[0]).length>0) {
 							if (targetSec[0].startsWith("#")) {
 								$(targetSec[0]).html(targetSec[1]);
@@ -398,6 +416,7 @@ function defaultResponseCall(){
 				}
 			});
 		}
+		
 		if(parsedScript!=""){
 			try {
 				eval(parsedScript)
