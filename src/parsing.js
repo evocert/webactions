@@ -33,7 +33,7 @@ function parseActivePassive(prsng,unparsedcontent){
     }
 
     if (typeof prsng.endlbl!=="string") {
-        prsng["endlbl"]="[@";
+        prsng["endlbl"]="@]";
     }
 
     function flushPassive(prsng){

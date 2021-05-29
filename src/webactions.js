@@ -404,13 +404,26 @@ function defaultResponseCall(){
 		if(targets.length>0){
 			targets.forEach(function(targetSec){
 				if ($(targetSec[0]).length>0) {
-							if (targetSec[0].startsWith("#")) {
-								$(targetSec[0]).html(targetSec[1]);
+					if (targetSec[0].startsWith("#")) {
+						if (typeof parseActivePassive === "function") {
+							parseActivePassive({print:function(prntthis){
+								$(targetSec[0]).html(prntthis);
+							}},targetSec[1]);
+						} else {
+							$(targetSec[0]).html(targetSec[1]);
+						}
+					} else {
+						$(targetSec[0]).each(function(i){
+							var tthis=this;
+							if (typeof parseActivePassive === "function") {
+								parseActivePassive({print:function(prntthis){
+									$(tthis).html(prntthis);
+								}},targetSec[1]);
 							} else {
-								$(targetSec[0]).each(function(i){
-									$(this).html(targetSec[1])
-								});
+								$(tthis).html(targetSec[1])
 							}
+						});
+					}
 				}
 			});
 		}
