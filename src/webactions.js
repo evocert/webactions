@@ -395,10 +395,23 @@ function defaultResponseCall(){
 		}
 		if  (target!=="" && response!==""){
 			if (target.startsWith("#")) {
-				$(target).html(response);
+				if (enableActivePassive && typeof parseActivePassive === "function") {
+					parseActivePassive({print:function(prntthis){
+						$(target).html(prntthis);
+					}},response);
+				} else {
+					$(target).html(response);
+				}
 			} else {
 				$(target).each(function(i){
-					$(this).html(response)
+					var tthis=this;
+					if (enableActivePassive && typeof parseActivePassive === "function") {
+						parseActivePassive({print:function(prntthis){
+							$(tthis).html(prntthis);
+						}},targetSec[1]);
+					} else {
+						$(this).html(response);
+					}
 				});
 			}
 		}
@@ -421,7 +434,7 @@ function defaultResponseCall(){
 									$(tthis).html(prntthis);
 								}},targetSec[1]);
 							} else {
-								$(tthis).html(targetSec[1])
+								$(tthis).html(targetSec[1]);
 							}
 						});
 					}
