@@ -5,7 +5,13 @@ function parseActivePassive(prsng,unparsedcontent){
 
     var passive="";
     var print=function(prntthis) {
-        passive+=prntthis; 
+        if (typeof prntthis === "string" && prntthis!=="") {
+            if (prntthis.length>3 && prntthis[0]==="`" && prntthis[prntthis.length-1]==="`"){
+                passive+=eval(prntthis);
+            } else {
+                passive+=prntthis;
+            }
+        }       
     }
 
     function iterateString(prsgn,stringtoiterate,functoprsr) {
