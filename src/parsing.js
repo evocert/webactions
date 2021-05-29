@@ -28,6 +28,14 @@ function parseActivePassive(prsng,unparsedcontent){
     var endi=0;
     var content=[];
 
+    if (typeof prsng.beglbl!=="string") {
+        prsng["beglbl"]="[@";
+    }
+
+    if (typeof prsng.endlbl!=="string") {
+        prsng["endlbl"]="[@";
+    }
+
     function flushPassive(prsng){
         if (tmppassive!="") {
             if(foundCode) {
