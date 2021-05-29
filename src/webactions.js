@@ -363,7 +363,6 @@ function postNode(){
 
 function defaultResponseCall(){
 	var args=[].slice.call(arguments);
-	//"ajax",options,response,textStatus,xhr
 	if (args.length>=4) {
 		
 		var options=args[1];
@@ -386,11 +385,11 @@ function defaultResponseCall(){
 			if(response.indexOf(`${replacelabel}||`)>-1){
 				parsed=parseActiveString(`${replacelabel}||`,`||${replacelabel}`,response);
 				response=parsed[0];
-				parsed[1].forEach(function(possibleTargetContent,i){
+				for(let possibleTargetContent of parsed[1]){
 					if(possibleTargetContent.indexOf("||")>-1){
 						targets[targets.length]=[possibleTargetContent.substring(0,possibleTargetContent.indexOf("||")),possibleTargetContent.substring(possibleTargetContent.indexOf("||")+"||".length,possibleTargetContent.length)];
 					}        				
-				});
+				}
 			}
 		}
 		if  (target!=="" && response!==""){
@@ -404,7 +403,6 @@ function defaultResponseCall(){
 		}
 		if(targets.length>0){
 			targets.forEach(function(targetSec){
-				alert(targetSec[0]);
 				if ($(targetSec[0]).length>0) {
 							if (targetSec[0].startsWith("#")) {
 								$(targetSec[0]).html(targetSec[1]);
@@ -434,7 +432,6 @@ function safeData(data, fileName,contentType) {
     var a = document.createElement("a");
     document.body.appendChild(a);
     a.style = "display: none";
-   
 		blob = new Blob([data], {type: contentType}),
 		url = window.URL.createObjectURL(blob);
 	a.href = url;
@@ -448,26 +445,19 @@ function parseActiveString(labelStart,labelEnd,passiveString){
 	this.parsedActiveString="";
 	this.parsedActiveArr=[];
 	this.passiveStringIndex=0;
-	this.passiveStringArr=Array.from(passiveString);
-	
-	this.passiveStringLen=this.passiveStringArr.length;
-	
+	this.passiveStringArr=[...passiveString];	
 	this.labelStartIndex=0;
-	this.labelEndIndex=0;
-	
-	this.labelStartArr=Array.from(labelStart);
-	this.labelEndArr=Array.from(labelEnd);
+	this.labelEndIndex=0;	
+	this.labelStartArr=[...labelStart];
+	this.labelEndArr=[...labelEnd];
 	this.pc='';
-	
-	this.passiveStringArr.forEach(function(c,i){
-		
+	for(let c of passiveStringArr){
 		if(this.labelEndIndex==0&&this.labelStartIndex<this.labelStartArr.length){
 			if(this.labelStartIndex>0&&this.labelStartArr[this.labelStartIndex-1]==pc&&this.labelStartArr[this.labelStartIndex]!=c){
 				this.parsedPassiveString+=labelStart.substring(0,this.labelStartIndex);
 				this.labelStartIndex=0;
 			}
-			if(this.labelStartArr[this.labelStartIndex]==c){
-				
+			if(this.labelStartArr[this.labelStartIndex]==c){	
 				this.labelStartIndex++;
 				if(this.labelStartIndex==this.labelStartArr.length){
 					
@@ -498,49 +488,35 @@ function parseActiveString(labelStart,labelEnd,passiveString){
 				}
 				this.parsedActiveString+=(c+"");
 			}
-		}
-		
+		}	
 		this.pc=c;		
-	});
+	}
 	return [this.parsedPassiveString,this.parsedActiveArr]
 }
 
 function getAllUrlParams(url) {
-
     // get query string from url (optional) or window
     var queryString = url ? url.split('?')[1] : "";
-    
     // we'll store the parameters here
     var obj = {};
-  
     // if query string exists
     if (queryString) {
-  
       // stuff after # is not part of query string, so get rid of it
       queryString = queryString.split('#')[0];
-  
       // split our query string into its component parts
       var arr = queryString.split('&');
-  
       for (var i = 0; i < arr.length; i++) {
         // separate the keys and the values
         var a = arr[i].split('=');
-  
         // set parameter name and value (use 'true' if empty)
         var paramName = decodeURIComponent(a[0]);
         var paramValue = typeof (a[1]) === 'undefined' ? "" : decodeURIComponent(a[1]);
-  
-        // (optional) keep case consistent
-        //paramName = paramName.toLowerCase();
-        //if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase();
-  
+
         // if the paramName ends with square brackets, e.g. colors[] or colors[2]
         if (paramName.match(/\[(\d+)?\]$/)) {
-  
           // create key if it doesn't exist
           var key = paramName.replace(/\[(\d+)?\]/, '');
           if (!obj[key]) obj[key] = [];
-  
           // if it's an indexed array e.g. colors[2]
           if (paramName.match(/\[\d+\]$/)) {
             // get the index value and add the entry at the appropriate position
@@ -566,6 +542,5 @@ function getAllUrlParams(url) {
         }
       }
     }
-    
     return obj;
   }

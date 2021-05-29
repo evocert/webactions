@@ -31,8 +31,12 @@ function parseActivePassive(prsng,unparsedcontent){
     function flushPassive(prsng){
         if (tmppassive!="") {
             if(foundCode) {
-                var cntntl=content.push(tmppassive+"");
-                tmpcode+="print(content["+(cntntl-1)+"]);";
+                if (tmppassive.length>1 && tmppassive.startsWith("`") && tmppassive.endsWith("`")) {
+                    tmpcode+="print(eval("+tmppassive+"));";
+                } else {
+                    var cntntl=content.push(tmppassive+"");
+                    tmpcode+="print(content["+(cntntl-1)+"]);";
+                }                
             } else {
                 print(tmppassive)
             }
