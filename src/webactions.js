@@ -273,11 +273,11 @@ function postNode(){
 				if(xhr.getResponseHeader("Content-Disposition")==null){
 					if(enableProgressElem){
 						if(progressElem!=undefined){
-									if (progressElem=="#showprogress") {
-												$.unblockUI();
-									} else {
-										$(progressElem).hide();
-									}
+							if (progressElem=="#showprogress") {
+										$.unblockUI();
+							} else {
+								$(progressElem).hide();
+							}
 						}
 					}
 					
