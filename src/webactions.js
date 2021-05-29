@@ -28,7 +28,7 @@ function postElem() {
 	$(elem).each(function() {
 		$.each(this.attributes, function() {
 			if(this.specified) {
-				if (this.name=="url_ref" || this.name=="form_ref" || this.name=="enable_progress_elem" || this.name=="progress_elem" || this.name=="target" || this.name=="command" || this.name=="scriptlabel" || this.name=="replacelabel"){
+				if (this.name=="url_ref" || this.name=="form_ref" || this.name=="enable_progress_elem" || this.name=="progress_elem" || this.name=="target" || this.name=="command" || this.name=="scriptlabel" || this.name=="replacelabel" || this.name==="activecontent"){
 					options[this.name] = this.value;
 				} else if (this.name=="json_ref"){
 					if (this.value!=undefined && this.value!="") {
@@ -373,6 +373,7 @@ function defaultResponseCall(){
 		}
 		var scriptlabel=options.scriptlabel+"";
 		var replacelabel=options.replacelabel+"";
+		var enableActivePassive=typeof options.activecontent === "boolean" && options.activecontent;
 		var response=args[2];
 		var parsed=parseActiveString(`${scriptlabel}||`,`||${scriptlabel}`,response);
 		var parsedScript=parsed[1].join("");
@@ -405,7 +406,7 @@ function defaultResponseCall(){
 			targets.forEach(function(targetSec){
 				if ($(targetSec[0]).length>0) {
 					if (targetSec[0].startsWith("#")) {
-						if (typeof parseActivePassive === "function") {
+						if (enableActivePassive && typeof parseActivePassive === "function") {
 							parseActivePassive({print:function(prntthis){
 								$(targetSec[0]).html(prntthis);
 							}},targetSec[1]);
@@ -415,7 +416,7 @@ function defaultResponseCall(){
 					} else {
 						$(targetSec[0]).each(function(i){
 							var tthis=this;
-							if (typeof parseActivePassive === "function") {
+							if (enableActivePassive && typeof parseActivePassive === "function") {
 								parseActivePassive({print:function(prntthis){
 									$(tthis).html(prntthis);
 								}},targetSec[1]);
