@@ -6,11 +6,7 @@ function parseActivePassive(prsng,unparsedcontent){
     var passive="";
     var print=function(prntthis) {
         if (typeof prntthis === "string" && prntthis!=="") {
-            if (prntthis.length>3 && prntthis[0]==="`" && prntthis[prntthis.length-1]==="`"){
-                passive+=eval(prntthis);
-            } else {
-                passive+=prntthis;
-            }
+            passive+=prntthis;
         }       
     }
 
