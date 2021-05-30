@@ -11419,7 +11419,7 @@ function defaultResponseCall(){
 		if  (target!=="" && response!==""){
 			if (target.startsWith("#")) {
 				if (enableActivePassive && typeof parseActivePassive === "function") {
-					parseActivePassive({print:function(prntthis){
+					parseActivePassive({beglbl:prsng.beglbl,endlbl:prsng.endlbl, print:function(prntthis){
 						$(target).html(prntthis);
 					}},response);
 				} else {
@@ -11429,7 +11429,7 @@ function defaultResponseCall(){
 				$(target).each(function(i){
 					var tthis=this;
 					if (enableActivePassive && typeof parseActivePassive === "function") {
-						parseActivePassive({print:function(prntthis){
+						parseActivePassive({beglbl:prsng.beglbl,endlbl:prsng.endlbl,print:function(prntthis){
 							$(tthis).html(prntthis);
 						}},targetSec[1]);
 					} else {
@@ -11443,7 +11443,7 @@ function defaultResponseCall(){
 				if ($(targetSec[0]).length>0) {
 					if (targetSec[0].startsWith("#")) {
 						if (enableActivePassive && typeof parseActivePassive === "function") {
-							parseActivePassive({print:function(prntthis){
+							parseActivePassive({beglbl:prsng.beglbl,endlbl:prsng.endlbl,print:function(prntthis){
 								$(targetSec[0]).html(prntthis);
 							}},targetSec[1]);
 						} else {
@@ -11453,7 +11453,7 @@ function defaultResponseCall(){
 						$(targetSec[0]).each(function(){
 							var tthis=this;
 							if (enableActivePassive && typeof parseActivePassive === "function") {
-								parseActivePassive({print:function(prntthis){
+								parseActivePassive({beglbl:prsng.beglbl,endlbl:prsng.endlbl,print:function(prntthis){
 									$(tthis).html(prntthis);
 								}},targetSec[1]);
 							} else {
