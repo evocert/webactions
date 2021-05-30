@@ -4,8 +4,10 @@ function parseActivePassive(prsng,unparsedcontent){
     }
 
     var passive="";
+    var canprintout=typeof prsng.print === "function";
+    
     var print=function(prntthis) {
-        if (typeof prntthis === "string" && prntthis!=="") {
+        if (canprintout && typeof prntthis === "string" && prntthis!=="") {
             passive+=prntthis;
         }       
     }
@@ -130,7 +132,7 @@ function parseActivePassive(prsng,unparsedcontent){
     }         
 
     if (passive!=="") {
-        if (typeof prsng.print === "function" ){
+        if (canprintout){
             prsng.print(passive);
         }
     }

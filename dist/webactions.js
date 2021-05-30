@@ -1,13 +1,3 @@
-function webactionRequestViaOptions(callbackurl,formid,actiontarget,command,enableProgressElem){
-	postForm({
-		url_ref:callbackurl,
-		form_ref:formid,
-		target:actiontarget,
-		command:command,
-        enable_progress_elem:enableProgressElem==undefined?"true":enableProgressElem
-	});
-}
-
 var lasturlref="";
 
 function postElem() {
@@ -28,7 +18,7 @@ function postElem() {
 	$(elem).each(function() {
 		$.each(this.attributes, function() {
 			if(this.specified) {
-				if (this.name=="url_ref" || this.name=="form_ref" || this.name=="enable_progress_elem" || this.name=="progress_elem" || this.name=="target" || this.name=="command" || this.name=="scriptlabel" || this.name=="replacelabel" || this.name==="activecontent"){
+				if (this.name=="url_ref" || this.name=="form_ref" || this.name=="enable_progress_elem" || this.name=="progress_elem" || this.name=="target" || this.name=="command" || this.name=="scriptlabel" || this.name=="replacelabel" || this.name==="parseoptions"){
 					options[this.name] = this.value;
 				} else if (this.name=="json_ref"){
 					if (this.value!=undefined && this.value!="") {
@@ -368,12 +358,18 @@ function defaultResponseCall(){
 		var options=args[1];
 		var target="";
 		if (options.target!==undefined) {
-			target=options.target+"";
-			
+			target=options.target+"";			
+		}
+		var prsng = {"beglbl":"[@","endlbl":"@]"};
+		var enableActivePassive=false;
+		if (typeof options.parseoptions === "object") {
+			enableActivePassive=true;
+			for(let prsk of Object.keys(options.parseoptions)){
+				prsng[prsk]=options.parseoptions[prsk]
+			}
 		}
 		var scriptlabel=options.scriptlabel+"";
 		var replacelabel=options.replacelabel+"";
-		var enableActivePassive=typeof options.activecontent === "boolean" && options.activecontent;
 		var response=args[2];
 		var parsed=parseActiveString(`${scriptlabel}||`,`||${scriptlabel}`,response);
 		var parsedScript=parsed[1].join("");
@@ -385,7 +381,7 @@ function defaultResponseCall(){
 		if(response!=""){
 			if(response.indexOf(`${replacelabel}||`)>-1){
 				parsed=parseActiveString(`${replacelabel}||`,`||${replacelabel}`,response);
-				response=parsed[0];
+				response=parsed[0].trim();
 				for(let possibleTargetContent of parsed[1]){
 					if(possibleTargetContent.indexOf("||")>-1){
 						targets[targets.length]=[possibleTargetContent.substring(0,possibleTargetContent.indexOf("||")),possibleTargetContent.substring(possibleTargetContent.indexOf("||")+"||".length,possibleTargetContent.length)];
@@ -416,7 +412,7 @@ function defaultResponseCall(){
 			}
 		}
 		if(targets.length>0){
-			targets.forEach(function(targetSec){
+			for(let targetSec of targets) {
 				if ($(targetSec[0]).length>0) {
 					if (targetSec[0].startsWith("#")) {
 						if (enableActivePassive && typeof parseActivePassive === "function") {
@@ -427,7 +423,7 @@ function defaultResponseCall(){
 							$(targetSec[0]).html(targetSec[1]);
 						}
 					} else {
-						$(targetSec[0]).each(function(i){
+						$(targetSec[0]).each(function(){
 							var tthis=this;
 							if (enableActivePassive && typeof parseActivePassive === "function") {
 								parseActivePassive({print:function(prntthis){
@@ -439,7 +435,7 @@ function defaultResponseCall(){
 						});
 					}
 				}
-			});
+			};
 		}
 		
 		if(parsedScript!=""){
@@ -467,51 +463,49 @@ function safeData(data, fileName,contentType) {
 	window.URL.revokeObjectURL(url);    
 }
 
-function parseActiveString(labelStart,labelEnd,passiveString){
+function parseActiveString(lblStart,lblEnd,passiveString){
 	this.parsedPassiveString="";
 	this.parsedActiveString="";
 	this.parsedActiveArr=[];
 	this.passiveStringIndex=0;
 	this.passiveStringArr=[...passiveString];	
-	this.labelStartIndex=0;
-	this.labelEndIndex=0;	
-	this.labelStartArr=[...labelStart];
-	this.labelEndArr=[...labelEnd];
+	this.lblsi=0;
+	this.lblei=0;
 	this.pc='';
 	for(let c of passiveStringArr){
-		if(this.labelEndIndex==0&&this.labelStartIndex<this.labelStartArr.length){
-			if(this.labelStartIndex>0&&this.labelStartArr[this.labelStartIndex-1]==pc&&this.labelStartArr[this.labelStartIndex]!=c){
-				this.parsedPassiveString+=labelStart.substring(0,this.labelStartIndex);
-				this.labelStartIndex=0;
+		if(this.lblei==0&&this.lblsi<lblStart.length){
+			if(this.lblsi>0&&lblStart[this.lbls-1]==pc&&lblStart[this.lblsi]!=c){
+				this.parsedPassiveString+=lblStart.substring(0,this.lblsi);
+				this.lblsi=0;
 			}
-			if(this.labelStartArr[this.labelStartIndex]==c){	
-				this.labelStartIndex++;
-				if(this.labelStartIndex==this.labelStartArr.length){
+			if(lblStart[this.lblsi]==c){	
+				this.lblsi++;
+				if(this.lblsi==lblStart.length){
 					
 				}
 			}
 			else{
-				if(this.labelStartindex>0){
-					this.parsedPassiveString+=labelStart.substring(0,this.labelStartIndex);
-					this.labelStartIndex=0;
+				if(this.lblsi>0){
+					this.parsedPassiveString+=lblStart.substring(0,this.lblsi);
+					this.lblsi=0;
 				}
-				this.parsedPassiveString+=(c+"");
+				this.parsedPassiveString+=c;
 			}
 		}
-		else if(this.labelStartIndex==this.labelStartArr.length&&this.labelEndIndex<this.labelEndArr.length){
-			if(this.labelEndArr[this.labelEndIndex]==c){
-				this.labelEndIndex++;
-				if(this.labelEndIndex==this.labelEndArr.length){
+		else if(this.lblsi==lblStart.length&&this.lblei<lblEnd.length){
+			if(lblEnd[this.lblei]==c){
+				this.lblei++;
+				if(this.lblei==lblEnd.length){
 					this.parsedActiveArr[this.parsedActiveArr.length]=this.parsedActiveString+"";
 					this.parsedActiveString="";
-					this.labelEndIndex=0;
-					this.labelStartIndex=0;
+					this.lblei=0;
+					this.lblsi=0;
 				}
 			}
 			else{
-				if(this.labelEndIndex>0){
-					this.parsedActiveString+=labelEnd.substring(0,this.labelEndIndex);
-					this.labelEndIndex=0;
+				if(this.lblei>0){
+					this.parsedActiveString+=lblEnd.substring(0,this.lblei);
+					this.lblei=0;
 				}
 				this.parsedActiveString+=(c+"");
 			}
