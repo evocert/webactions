@@ -5,7 +5,7 @@ function parseActivePassive(prsng,unparsedcontent){
 
     var passive="";
     var canprintout=typeof prsng.print === "function";
-    
+    var owner=typeof prsng.owner === "object" ? prsng.owner:null;
     var print=function(prntthis) {
         if (canprintout && typeof prntthis === "string" && prntthis!=="") {
             passive+=prntthis;
