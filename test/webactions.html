@@ -4,24 +4,45 @@
 		<meta charset="utf-8">
 		<title>WebActions Test</title>
 		<script type="application/javascript" src="../vendor/jquery/jquery.min.js"></script>
+		<script type="application/javascript" src="../vendor/jquery-mockjax/jquery.mockjax.min.js"></script>
 		<script type="application/javascript" src="../src/webactions.js"></script>
+		<script type="application/javascript" src="./js/webactions/index.js"></script>
+		<link rel="stylesheet" href="./css/webactions/style.css"></link>
 	</head>
 	<body>
 		<a href="./index.html">Back</a><br/><br/>
-		<div id="control">
-			<button id="btn0" onClick="postElem(this)" target="#output" url_ref="./res/0.txt" form_ref="#frm0">tst0</button>
-			<button id="btn1" onClick="postElem(this)" target="#output" url_ref="./res/1.txt" form_ref="#frm0">tst1</button>
-			<button id="btn2" onClick="postElem(this)"                  url_ref="./res/0.js"  form_ref="#frm0">tst2</button>
-			<button id="btn3" onClick="postElem(this)" target="#output" url_ref="./res/1.js"  form_ref="#frm0">tst2</button>
+		<div style="display:flex;">
+			<div style="width:50%;background:#222222;">
+				<div id="control">
+					<h3>Actual</h3>
+					<button id="btn0" onClick="postElem(this)" target="#output" url_ref="./res/0.txt" form_ref="#frm0">tst0</button>
+					<button id="btn1" onClick="postElem(this)" target="#output" url_ref="./res/1.txt" form_ref="#frm0">tst1</button>
+					<button id="btn2" onClick="postElem(this)"                  url_ref="./res/0.js"  form_ref="#frm0">tst2</button>
+					<button id="btn3" onClick="postElem(this)" target="#output" url_ref="./res/1.js"  form_ref="#frm0">tst2</button><br/>
+					<h3>Mock</h3>
+					<button id="btn4" onClick="postElem(this)" target="#output" url_ref="./mock/res/0.txt" form_ref="#frm0">tst0</button>
+					<button id="btn5" onClick="postElem(this)" target="#output" url_ref="./mock/res/1.txt" form_ref="#frm0">tst1</button>
+					<button id="btn6" onClick="postElem(this)"                  url_ref="./mock/res/0.js"  form_ref="#frm0">tst2</button>
+					<button id="btn7" onClick="postElem(this)" target="#output" url_ref="./mock/res/1.js"  form_ref="#frm0">tst2</button><br/>
+				</div>
+				<br/>
+				<div id="frm0">
+					<label>fld0 </label><input name="fld0" id="fld0"></input><br/>
+					<label>fld1 </label><input name="fld1" id="fld1"></input><br/>
+					<label>fld2 </label><input name="fld2" id="fld2"></input><br/>
+					<label>fld3 </label><input name="fld3" id="fld3"></input><br/>
+				</div>
+				<h3>Output</h3>
+				<pre id="output"></pre>
+			</div>
+			<div style="width:50%;background:#444444;">
+				<div id="mock">
+					<h3>Mock Response</h3>
+					<textarea id="static_response" rows="25" style="width:100%;background:#888888;border:unset;"></textarea>
+				</div>
+			</div>
+
 		</div>
-		<br/>
-		<div id="frm0">
-			<label>fld0 </label><input name="fld0" id="fld0"></input><br/>
-			<label>fld1 </label><input name="fld1" id="fld1"></input><br/>
-			<label>fld2 </label><input name="fld2" id="fld2"></input><br/>
-			<label>fld3 </label><input name="fld3" id="fld3"></input><br/>
-		</div>
-		<pre id="output"></pre>
 		<script>
 		</script>
 	</body>
