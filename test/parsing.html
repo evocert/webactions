@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<title>Parsing Test</title>
+		<script type="application/javascript" src="../vendor/jquery/jquery.min.js"></script>
+		<script type="application/javascript" src="../src/parsing.js"></script>
+	</head>
+	<body>
+		<a href="./index.html">Back</a><br/>
+		<div id="output"></div>
+		<div id="console"></div>
+		<script>
+			function test(){
+				var src=`
+					[@for(var i=0;i<8;i++){@]
+						<div>[@print(""+42);@]</div>
+					[@}@]
+				`;
+				var t0;
+				var t1;
+				//window.out="";
+				var target=$("#output");
+				target.empty();
+				prsng={
+					target:target,
+					src:src,
+					beglbl:"[@",
+					endlbl:"@]",
+					t0:null,
+					t1:null,
+					out:"",
+					startParsing:function(){
+						t0=new Date();
+					},
+					print:function(val){
+						if(arguments!=="undefined"&&arguments.length>0){
+							target.html(target.html()+arguments[0]);
+						}
+					},
+					endParsing:function(){
+						t1=new Date();
+					}
+				};
+				var out=parseActivePassive(prsng,src);
+				var td=(t1-t0);
+				console.log(out);
+				$("#console").text("Execution Time:"+td);
+			}
+			test();
+		</script>
+	</body>
+</html>

@@ -1,5 +1,8 @@
+!(function(name,context,definition){if(typeof exports==='object'){module.exports=definition(require);}else if(typeof define==='function'&&define.amd){define(definition); }else{context[name]=definition();}
+}).call(this,'webaction',this,function(require){
+	var $=(typeof require==='function')?require('./jquery'):window.$;//dep
 var lasturlref="";
-
+	//original
 function postElem() {
 	var elem=[].slice.call(arguments);
 	if(elem==undefined) return;
@@ -565,3 +568,20 @@ function getAllUrlParams(url) {
     }
     return obj;
   }
+  var exports={
+	postElem:postElem,
+	postNode:postNode,
+	defaultResponseCall:postNode,
+	defaultResponseErrorCall:defaultResponseErrorCall,
+	safeData:safeData,
+	parseActiveString:parseActiveString,
+	getAllUrlParams:getAllUrlParams
+  }
+  if(typeof(require)==='function'){
+    return exports;
+  }else{
+     Object.keys(exports).forEach(function(){
+         window[k]=exports[k];
+     }.bind(this));
+  }
+});
