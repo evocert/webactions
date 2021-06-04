@@ -1,0 +1,30 @@
+body{
+	background:#222222;
+}
+h3{
+	color:#888888;
+	font-family:Arial;
+	text-transform:uppercase;
+	font-weight:bold;
+}
+button{
+	background:#444444;
+	color:#888888;
+	border:unset;
+	height:32px;
+}
+label{
+	color:#888888;
+	font-family:Arial;
+	text-transform:uppercase;
+	font-weight:bold;
+}
+input{
+	background:#444444;
+	color:#888888;
+	border:unset;
+	height:32px;
+	font-family:Arial;
+	text-transform:uppercase;
+	font-weight:bold;
+}
