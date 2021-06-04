@@ -21,7 +21,7 @@
 		$(elem).each(function() {
 			$.each(this.attributes, function() {
 				if(this.specified) {
-					if (this.name=="url_ref" || this.name=="form_ref" || this.name=="enable_progress_elem" || this.name=="progress_elem" || this.name=="target" || this.name=="command" || this.name=="scriptlabel" || this.name=="replacelabel" || this.name==="parseoptions"){
+					if (this.name=="url_ref" || this.name=="form_ref" || this.name=="enable_progress_elem" || this.name=="progress_elem" || this.name=="target" || this.name=="scriptlabel" || this.name=="replacelabel" || this.name==="parseoptions" || this.name==="mockcontent" ){
 						options[this.name] = this.value;
 					} else if (this.name=="json_ref"){
 						if (this.value!=undefined && this.value!="") {
@@ -71,24 +71,24 @@
 		var hasForm=false;
 		var enableProgressElem=false;
 
-		if(options.enable_progress_elem!=undefined&&options.enable_progress_elem!=""){
-			enableProgressElem=options.enable_progress_elem=="true"?true:false;
+		if(typeof options.progress_elem === "string" && options.progress_elem!==""){
+			enableProgressElem=true;
 		}
-
 		var progressElem="";
 		var hasJson=false;
 		var errorElem="";
 		var urlref="";
 		var formid="";
-		var command="";
-		
-		if(options.command!=undefined&&options.command!=""){
-			command=options.command;
+
+		var mockcontent="";
+
+		if(typeof options.mockcontent ==="string" && options.mockcontent!==""){
+			mockcontent=(options.mockcontent+"").trim();
 		}
 		
-		if(options.form_ref!=undefined&&options.form_ref!=""){
+		if(typeof options.form_ref ==="string" && options.form_ref!==""){
 			hasForm=true;
-			formid=options.form_ref;
+			formid=(options.form_ref+"").trim();
 		}
 
 		var jsondata=null;
@@ -100,37 +100,15 @@
 		
 		var target="";
 		if(enableProgressElem) {
-			if(options.progress_elem!=undefined){
-				progressElem=options.progress_elem+"";
-			} else{
-				$.blockUI({ 
-					message : '<span style="font-size:1.2em" id="showprogress">Please wait ...</span>',
-					css: { 
-					border: 'none', 
-					padding: '15px', 
-					backgroundColor: '#000', 
-					'-webkit-border-radius': '10px', 
-					'-moz-border-radius': '10px', 
-					opacity: .7, 
-					color: '#fff'
-					}
-				});
-				progressElem="#showprogress";
-			}
-		
-			if(progressElem!=undefined){
-				if (progressElem!="#showprogress") {
-					$(progressElem).show();
-				}
-			}
+			$(progressElem).show();
 		}
 		
-		if(options.error_elem!=undefined){
+		if(typeof options.error_elem ==="string" && options.error_elem!==""){
 			errorElem=(options.error_elem+"").trim();
 		} else {
 			errorElem="";
 		}
-		if(options.url_ref!=undefined){
+		if(typeof options.url_ref === "string" && options.url_ref!==""){
 			urlref=(options.url_ref+"").trim();
 		} else {
 			urlref=(lasturlref+"").trim();
@@ -167,7 +145,6 @@
 							}
 						});
 					} else {
-						
 						if(hasJson) {
 							if (formData["reqst-params"][fname]==undefined){
 								formData["reqst-params"][fname]=[];
@@ -233,107 +210,81 @@
 				}
 			});
 		}
-		
-		if (command!=""){
-			if (hasJSon) {
-			} else {
-				formData.append("command",command);
-			}
+
+		var replacelabel="replace-content";
+		if(typeof options.replacelabel === "string" &&(options.replacelabel!="").trim()!==""){
+			replacelabel=(options.replacelabel!="").trim();
+		} else {
+			options.replacelabel=replacelabel;
 		}
+		var scriptlabel="script";
+		if(typeof options.scriptlabel==="string" &&(options.scriptlabel!="")!==""){
+			scriptlabel=(options.scriptlabel!="");
+		} else {
+			options.scriptlabel=scriptlabel;
+		}
+		
 		var responseFunc=defaultResponseCall;
 		var responseErrorFunc=defaultResponseErrorCall;
 
 		var ajaxpromise=new Promise(function(resolve, reject) {
-			$.ajax({
-				xhr: function () {
-					var xhr = $.ajaxSettings.xhr();
-					xhr.upload.onprogress = function (e) {
-						if(enableProgressElem) {
-							if(progressElem!=undefined&&progressElem!=""){
+			if (mockcontent==="") {
+				$.ajax({
+					xhr: function () {
+						var xhr = $.ajaxSettings.xhr();
+						xhr.upload.onprogress = function (e) {
+							if(enableProgressElem) {
 								$(progressElem).html(Math.floor(e.loaded / e.total * 100) + '%');
 							}
-						}
-					};
-					xhr.withCredentials = false;
-					return xhr;
-				},
-				contentType:hasJson?"application/json":false,
-				processData: false,
-				type: 'POST',
-				data:hasJson?JSON.stringify(formData):formData,
-				url: urlref,
-				success: function (response,textStatus,xhr) {
-					if(xhr.getResponseHeader("Content-Disposition")==null){
+						};
+						xhr.withCredentials = false;
+						return xhr;
+					},
+					contentType:hasJson?"application/json":false,
+					processData: false,
+					type: 'POST',
+					data:hasJson?JSON.stringify(formData):formData,
+					url: urlref,
+					success: function (response,textStatus,xhr) {
 						if(enableProgressElem){
-							if(progressElem!=undefined){
-								if (progressElem=="#showprogress") {
-											$.unblockUI();
-								} else {
-									$(progressElem).hide();
-								}
-							}
+							$(progressElem).hide();
 						}
-						
-						var replacelabel="replace-content";
-						if(options.replacelabel!=undefined&&(options.replacelabel!="").trim()!==""){
-							replacelabel=(options.replacelabel!="").trim();
-						}
-						var scriptlabel="script";
-						if(options.scriptlabel!=undefined&&(options.scriptlabel!="")!==""){
-							scriptlabel=(options.scriptlabel!="");
-						}
-		
 						if (responseFunc!=null) {
-							if(options.replacelabel==undefined){
-								options.replacelabel=replacelabel;
-							}
-							if(options.scriptlabel==undefined){
-								options.scriptlabel=scriptlabel;
-							}
 							try {
 								responseFunc("ajax",options,response,textStatus,xhr)
 								resolve();
 							} catch(e) {
 								reject(e);
 							}
-						}					
-					} else {
-						var contentdisposition=(""+xhr.getResponseHeader("Content-Disposition")).trim();
-						if (contentdisposition.indexOf("attachment;")>-1) {
-							contentdisposition=contentdisposition.substr(contentdisposition.indexOf("attachment;")+"attachment;".length).trim();
 						}
-						var contenttype=(""+xhr.getResponseHeader("Content-Type")).trim();
-						if (contenttype.indexOf(";")>-1) {
-							contenttype=contenttype.substr(0,contenttype.indexOf(";")).trim();
+					},
+					error: function(jqXHR, textStatus, textThrow) {
+						if(enableProgressElem) {
+							$(progressElem).hide();
 						}
-						if (contentdisposition.indexOf("filename=")>-1) {
-							contentdisposition=contentdisposition.substr(contentdisposition.indexOf("filename=")+"filename=".length).trim();
-							contentdisposition=contentdisposition.replace(/"/i,"")
-							contentdisposition=contentdisposition.replace(/"/i,"")
-						}
-						safeData(responseText,contentdisposition,contenttype);
-					}
-				},
-				error: function(jqXHR, textStatus, textThrow) {
-					if(enableProgressElem) {
-						if(progressElem!=undefined){
-							if (progressElem=="#showprogress") {
-										$.unblockUI();
-							} else {
-								$(progressElem).hide();
+						if(responseErrorFunc!==undefined) {
+							responseErrorFunc("ajax",options,textStatus,jqXHR)
+						} else {
+							if(errorElem!==""){
+								$(errorElem).html("Error loading request: "+textStatus);
 							}
 						}
+						reject(Error("Error loading request: "+textStatus));
 					}
-					if(responseErrorFunc!==undefined) {
-						responseErrorFunc("ajax",options,textStatus,jqXHR)
-					} else {
-						if(errorElem!=undefined&&errorElem!=""){
-							$(errorElem).html("Error loading request: "+textStatus);
-						}
-					}
-					reject(Error("Error loading request: "+textStatus));
+				});
+			} else {
+				if(enableProgressElem){
+					$(progressElem).hide();
 				}
-			});
+				if (responseFunc!=null) {
+					try {
+						responseFunc("mockajax",options,mockcontent)
+						resolve();
+					} catch(e) {
+						reject(e);
+					}
+				}
+			}
 		});
 
 		ajaxpromise.then(function(){
@@ -356,7 +307,7 @@
 
 	function defaultResponseCall(){
 		var args=[].slice.call(arguments);
-		if (args.length>=4) {
+		if (args.length>=3) {
 			
 			var options=args[1];
 			var target="";
@@ -456,17 +407,6 @@
 
 	function defaultResponseErrorCall(){
 		var options=[].slice.call(arguments);
-	}
-	function safeData(data, fileName,contentType) {
-		var a = document.createElement("a");
-		document.body.appendChild(a);
-		a.style = "display: none";
-			blob = new Blob([data], {type: contentType}),
-			url = window.URL.createObjectURL(blob);
-		a.href = url;
-		a.download = fileName;
-		a.click();
-		window.URL.revokeObjectURL(url);    
 	}
 
 	function parseActiveString(lblStart,lblEnd,passiveString){
@@ -576,7 +516,6 @@
 		postNode:postNode,
 		defaultResponseCall:postNode,
 		defaultResponseErrorCall:defaultResponseErrorCall,
-		safeData:safeData,
 		parseActiveString:parseActiveString,
 		getAllUrlParams:getAllUrlParams
 	}
