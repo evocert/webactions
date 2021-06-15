@@ -10898,8 +10898,8 @@ return jQuery;
 
 	    function iterateString(prsgn,stringtoiterate,functoprsr) {
             if (typeof stringtoiterate==="string" && typeof functoprsr === "function") {
-                for(let cdr of stringtoiterate) {
-                functoprsr(prsgn,cdr)
+                for(var i=0;i<stringtoiterate.length;i++) {
+                    functoprsr(prsgn,stringtoiterate[i]);
                 }
             }
 	    }
