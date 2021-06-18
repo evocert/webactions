@@ -123,6 +123,7 @@
                 if(atvprsdi>-1) {
                     atvprsdi=-1;
                 }
+                console.Log("tmpcode:"+tmpcode);
                 tmpcode="";
             }
 	    }
