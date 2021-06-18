@@ -8,6 +8,7 @@
 	    }
 
 	    var passive="";
+        var unsprsdln=0;
 	    var canprintout=typeof prsng.print === "function";
 	    var owner=typeof prsng.owner === "object" ? prsng.owner:null;
 	    var print=function(prntthis) {
@@ -15,11 +16,34 @@
                 passive+=prntthis;
             }       
 	    }
+        var altFlushPassive=typeof prsng.flushpassive === "function"?prsng.flushpassive:null
+        var altFlushPassiveResult=null;
+        var altFlushActive=typeof prsng.flushactive === "function"?prsng.flushactive:null
+        var altFlushActiveResult=null;
+        var altEvalActive=typeof prsng.evalactive === "function"?prsng.evalactive:null
+        var stillvalid=true;
 
 	    function iterateString(prsgn,stringtoiterate,functoprsr) {
-            if (typeof stringtoiterate==="string" && typeof functoprsr === "function") {
-                for(var i=0;i<stringtoiterate.length;i++) {
-                    functoprsr(prsgn,stringtoiterate[i]);
+            if (stillvalid && stringtoiterate!=null) {
+                if (typeof stringtoiterate === "function") {
+                    var tmpstringtoiterate=null;
+                    while(stillvalid){
+                        if((tmpstringtoiterate=stringtoiterate())!=null && typeof tmpstringtoiterate === "string") {
+                            for(var i=0;i<tmpstringtoiterate.length;i++) {
+                                functoprsr(prsgn,tmpstringtoiterate[i]);
+                                unsprsdln++
+                                if (!stillvalid) break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                } else if (typeof stringtoiterate==="string" && typeof functoprsr === "function") {
+                    for(var i=0;i<stringtoiterate.length;i++) {
+                        functoprsr(prsgn,stringtoiterate[i]);
+                        unsprsdln++
+                        if (!stillvalid) break;
+                    }
                 }
             }
 	    }
@@ -44,22 +68,28 @@
 
 	    function flushPassive(prsng){
             if (tmppassive!="") {
-                if(foundCode) {
-                if (tmppassive.length>1 && tmppassive.startsWith("`") && tmppassive.endsWith("`")) {
-                    tmpcode+="print("+tmppassive+");";                    
-                } else {
-                    var cntntl=content.push(tmppassive+"");
-                    tmpcode+="print(content["+(cntntl-1)+"]);";
-                }                
-                } else {
-                print(tmppassive)
+                if (altFlushPassive!=null && typeof altFlushPassive === "function") {
+                    if((altFlushPassiveResult=altFlushPassive(tmppassive,unsprsdln))!=null && typeof altFlushPassiveResult ==="boolean" && altFlushPassiveResult===false){
+                        stillvalid=false;
+                    }
+                } else { 
+                    if(foundCode) {
+                        if (tmppassive.length>1 && tmppassive.startsWith("`") && tmppassive.endsWith("`")) {
+                            tmpcode+="print("+tmppassive+");";                    
+                        } else {
+                            var cntntl=content.push(tmppassive+"");
+                            tmpcode+="print(content["+(cntntl-1)+"]);";
+                        }                
+                    } else {
+                        print(tmppassive)
+                    }
                 }
                 tmppassive="";
             }
 	    }
 
 	    function parsePsvChar(prsng,chr) {
-            flushCode();
+            flushCode(prsng);
             tmppassive+=chr;
 	    }
 
@@ -78,9 +108,15 @@
             }
 	    }
 
-	    function flushCode(){
+	    function flushCode(prsgn){
             if(tmpcode!="") {
-                code+=tmpcode;
+                if (altFlushActive!=null && typeof altFlushActive === "function") {
+                    if((altFlushActiveResult=altFlushActive(tmppassive,unsprsdln))!=null && typeof altFlushActiveResult ==="boolean" && altFlushActiveResult===false){
+                        stillvalid=false;
+                    }                    
+                } else {
+                    code+=tmpcode;
+                }
                 tmpcode="";
             }
 	    }
@@ -130,9 +166,13 @@
 	    iterateString(prsng,unparsedcontent,parsechr);
 	    
 	    flushPassive(prsng); 
-	    flushCode();
+	    flushCode(prsng);
 	    if (foundCode && code!="") {
-		    eval(code);
+            if (altEvalActive!=null && typeof altEvalActive === "function") {
+                altEvalActive(code);
+            } else {
+		        eval(code);
+            }
 	    }         
 
 	    if (passive!=="") {
