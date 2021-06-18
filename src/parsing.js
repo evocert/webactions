@@ -117,7 +117,6 @@
 
 	    function flushCode(prsgn){
             if(tmpcode!="") {
-                console.Log("tmpcode:"+tmpcode);
                 if (altFlushActive!=null && typeof altFlushActive === "function") {
                     if((altFlushActiveResult=altFlushActive(tmpcode,atvprsdi))!=null && typeof altFlushActiveResult ==="boolean" && altFlushActiveResult===false){
                         stillvalid=false;
