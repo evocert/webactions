@@ -16,11 +16,11 @@
                 passive+=prntthis;
             }       
 	    }
-        var altFlushPassive=typeof prsng.flushpassive === "function"?prsng.flushpassive:null
+        var altFlushPassive=typeof prsng.flushpassive === "function"?prsng.flushpassive:null;
         var altFlushPassiveResult=null;
-        var altFlushActive=typeof prsng.flushactive === "function"?prsng.flushactive:null
+        var altFlushActive=typeof prsng.flushactive === "function"?prsng.flushactive:null;
         var altFlushActiveResult=null;
-        var altEvalActive=typeof prsng.evalactive === "function"?prsng.evalactive:null
+        var altEvalActive=typeof prsng.evalactive === "function"?prsng.evalactive:null;
         var stillvalid=true;
 
 	    function iterateString(prsgn,stringtoiterate,functoprsr) {
