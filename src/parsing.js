@@ -5,6 +5,8 @@
 		    prsng.startParsing();
 	    }
 
+        var trimcode=(typeof prsng.trimactive === "boolean")?prsng.trimactive:true;
+
 	    var passive="";
         var unsprsdln=-1;
         var psvprsdi=-1;
@@ -98,8 +100,10 @@
 
 	    function parseCodeChar(prsng,chr) {
             if(!hasCode) {
-                if ((chr+"").trim()!=="") {
-                hasCode=true;
+                if (trimcode && (chr+"").trim()!=="") {
+                    hasCode=true;
+                } else {
+                    hasCode=true;
                 }
             }
             if (hasCode) {
