@@ -25,7 +25,13 @@
 
 	    function iterateString(prsgn,stringtoiterate,functoprsr) {
             if (stillvalid && stringtoiterate!=null) {
-                if (typeof stringtoiterate === "function") {
+                if (typeof stringtoiterate==="string" && typeof functoprsr === "function") {
+                    for(var i=0;i<stringtoiterate.length;i++) {
+                        functoprsr(prsgn,stringtoiterate[i]);
+                        unsprsdln++
+                        if (!stillvalid) break;
+                    }
+                } else if (typeof stringtoiterate === "function") {
                     var tmpstringtoiterate=null;
                     while(stillvalid){
                         if((tmpstringtoiterate=stringtoiterate())!=null && typeof tmpstringtoiterate === "string") {
@@ -37,12 +43,6 @@
                         } else {
                             break;
                         }
-                    }
-                } else if (typeof stringtoiterate==="string" && typeof functoprsr === "function") {
-                    for(var i=0;i<stringtoiterate.length;i++) {
-                        functoprsr(prsgn,stringtoiterate[i]);
-                        unsprsdln++
-                        if (!stillvalid) break;
                     }
                 }
             }
