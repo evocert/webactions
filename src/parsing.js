@@ -1,14 +1,14 @@
 !(function(name,context,definition){if(typeof exports==='object'){module.exports=definition(require);}else if(typeof define==='function'&&define.amd){define(definition); }else{context[name]=definition();}
 }).call(this,'parseActivePassive',this,function(require){
-	var $=(typeof require==='function')?require('./jquery'):window.$;//dep
-	
     function parseActivePassive(prsng,unparsedcontent){
 	    if (typeof prsng.startParsing === "function") {
 		    prsng.startParsing();
 	    }
 
 	    var passive="";
-        var unsprsdln=0;
+        var unsprsdln=-1;
+        var psvprsdi=-1;
+        var atvprsdi=-1;
 	    var canprintout=typeof prsng.print === "function";
 	    var owner=typeof prsng.owner === "object" ? prsng.owner:null;
 	    var print=function(prntthis) {
@@ -27,8 +27,8 @@
             if (stillvalid && stringtoiterate!=null) {
                 if (typeof stringtoiterate==="string" && typeof functoprsr === "function") {
                     for(var i=0;i<stringtoiterate.length;i++) {
-                        functoprsr(prsgn,stringtoiterate[i]);
                         unsprsdln++
+                        functoprsr(prsgn,stringtoiterate[i]);
                         if (!stillvalid) break;
                     }
                 } else if (typeof stringtoiterate === "function") {
@@ -36,8 +36,8 @@
                     while(stillvalid){
                         if((tmpstringtoiterate=stringtoiterate())!=null && typeof tmpstringtoiterate === "string") {
                             for(var i=0;i<tmpstringtoiterate.length;i++) {
-                                functoprsr(prsgn,tmpstringtoiterate[i]);
                                 unsprsdln++
+                                functoprsr(prsgn,tmpstringtoiterate[i]);
                                 if (!stillvalid) break;
                             }
                         } else {
@@ -69,7 +69,7 @@
 	    function flushPassive(prsng){
             if (tmppassive!="") {
                 if (altFlushPassive!=null && typeof altFlushPassive === "function") {
-                    if((altFlushPassiveResult=altFlushPassive(tmppassive,unsprsdln))!=null && typeof altFlushPassiveResult ==="boolean" && altFlushPassiveResult===false){
+                    if((altFlushPassiveResult=altFlushPassive(tmppassive,psvprsdi))!=null && typeof altFlushPassiveResult ==="boolean" && altFlushPassiveResult===false){
                         stillvalid=false;
                     }
                 } else { 
@@ -83,6 +83,9 @@
                     } else {
                         print(tmppassive)
                     }
+                }
+                if (psvprsdi>-1) {
+                    psvprsdi=-1;
                 }
                 tmppassive="";
             }
@@ -111,11 +114,14 @@
 	    function flushCode(prsgn){
             if(tmpcode!="") {
                 if (altFlushActive!=null && typeof altFlushActive === "function") {
-                    if((altFlushActiveResult=altFlushActive(tmppassive,unsprsdln))!=null && typeof altFlushActiveResult ==="boolean" && altFlushActiveResult===false){
+                    if((altFlushActiveResult=altFlushActive(tmppassive,atvprsdi))!=null && typeof altFlushActiveResult ==="boolean" && altFlushActiveResult===false){
                         stillvalid=false;
                     }                    
                 } else {
                     code+=tmpcode;
+                }
+                if(atvprsdi>-1) {
+                    atvprsdi=-1;
                 }
                 tmpcode="";
             }
@@ -123,6 +129,9 @@
 	    
 	    function parsechr(prsng,chr) {
             if (endi==0 && begi<prsng.beglbl.length) {
+                if (psvprsdi==-1) {
+                    psvprsdi=unsprsdln;
+                }
                 if (begi>0 && prsng.beglbl[begi-1]==prvc && prsng.beglbl[begi]!==chr) {
                 var bi=begi;
                 begi=0;
@@ -145,6 +154,9 @@
                 parsePsvChar(prsng, prvc=chr);
                 }
             } else if (begi==prsng.beglbl.length && endi<prsng.endlbl.length) {
+                if (atvprsdi==-1) {
+                    atvprsdi=unsprsdln;
+                }
                 if (prsng.endlbl[endi]===chr) {
                     endi++;
                         if (endi===prsng.endlbl.length){
