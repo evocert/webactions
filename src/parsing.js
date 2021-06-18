@@ -114,7 +114,7 @@
 	    function flushCode(prsgn){
             if(tmpcode!="") {
                 if (altFlushActive!=null && typeof altFlushActive === "function") {
-                    if((altFlushActiveResult=altFlushActive(tmppassive,atvprsdi))!=null && typeof altFlushActiveResult ==="boolean" && altFlushActiveResult===false){
+                    if((altFlushActiveResult=altFlushActive(tmpcode,atvprsdi))!=null && typeof altFlushActiveResult ==="boolean" && altFlushActiveResult===false){
                         stillvalid=false;
                     }                    
                 } else {
