@@ -60,11 +60,11 @@
 	    var endi=0;
 	    var content=[];
 
-	    if (typeof prsng.beglbl!=="string") {
+	    if (typeof prsng.beglbl!=="string" && typeof prsng.beglbl!=="function") {
 		    prsng["beglbl"]="[@";
 	    }
 
-	    if (typeof prsng.endlbl!=="string") {
+	    if (typeof prsng.endlbl!=="string" && typeof prsng.endlbl!=="function") {
 		    prsng["endlbl"]="@]";
 	    }
 
@@ -130,20 +130,34 @@
                 tmpcode="";
             }
 	    }
+
+        function beglbl(prsng) {
+            if (typeof prsng.beglbl=== "function") {
+                return prsng.beglbl()
+            }
+            return prsng.beglbl;
+        }
+
+        function endlbl(prsng) {
+            if (typeof prsng.endlbl=== "function") {
+                return prsng.endlbl()
+            }
+            return prsng.endlbl;
+        }
 	    
 	    function parsechr(prsng,chr) {
-            if (endi==0 && begi<prsng.beglbl.length) {
+            if (endi==0 && begi<beglbl(prsng).length) {
                 if (psvprsdi==-1) {
                     psvprsdi=unsprsdln;
                 }
-                if (begi>0 && prsng.beglbl[begi-1]==prvc && prsng.beglbl[begi]!==chr) {
+                if (begi>0 && beglbl(prsng)[begi-1]==prvc && beglbl(prsng)[begi]!==chr) {
                 var bi=begi;
                 begi=0;
-                iterateString(prsng,prsng.beglbl.substring(0,bi),parsePsvChar);
+                iterateString(prsng,beglbl(prsng).substring(0,bi),parsePsvChar);
                 }
-                if (prsng.beglbl[begi]===chr) {
+                if (beglbl(prsng)[begi]===chr) {
                 begi++;
-                if (begi===prsng.beglbl.length){
+                if (begi===beglbl(prsng).length){
                     prvc="";
                     prvc="";
                 } else {
@@ -153,17 +167,17 @@
                 if (begi>0) {
                     var bi=begi;
                     begi=0;
-                    iterateString(prsng,prsng.beglbl.substring(0,bi),parsePsvChar);
+                    iterateString(prsng,beglbl(prsng).substring(0,bi),parsePsvChar);
                 }
                 parsePsvChar(prsng, prvc=chr);
                 }
-            } else if (begi==prsng.beglbl.length && endi<prsng.endlbl.length) {
+            } else if (begi==beglbl(prsng).length && endi<endlbl(prsng).length) {
                 if (atvprsdi==-1) {
                     atvprsdi=unsprsdln;
                 }
-                if (prsng.endlbl[endi]===chr) {
+                if (endlbl(prsng)[endi]===chr) {
                     endi++;
-                        if (endi===prsng.endlbl.length){
+                        if (endi===endlbl(prsng).length){
                             begi=0;
                             endi=0;
                             prvc="";
@@ -172,7 +186,7 @@
                     if (endi>0) {
                         var bi=endi;
                         endi=0;
-                        iterateString(prsng,prsng.endlbl.substring(0,bi),parseCodeChar);
+                        iterateString(prsng,endlbl(prsng).substring(0,bi),parseCodeChar);
                     }
                     parseCodeChar(prsng, chr);
                 }
