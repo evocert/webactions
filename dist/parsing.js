@@ -1,28 +1,36 @@
 !(function(name,context,definition){if(typeof exports==='object'){module.exports=definition(require);}else if(typeof define==='function'&&define.amd){define(definition); }else{context[name]=definition();}
 }).call(this,'parseActivePassive',this,function(require){
     function parseActivePassive(prsng,unparsedcontent){
-	    if (typeof prsng.startParsing === "function") {
-		    prsng.startParsing();
+
+        function callprsng(){
+            if (typeof prsng==="function") {
+                return prsng();
+            } 
+            return prsng;
+        }
+
+	    if (typeof callprsng().startParsing === "function") {
+		    callprsng().startParsing();
 	    }
 
-        var trimcode=(typeof prsng.trimactive === "boolean")?prsng.trimactive:true;
+        var trimcode=(typeof callprsng().trimactive === "boolean")?callprsng().trimactive:true;
 
 	    var passive="";
         var unsprsdln=-1;
         var psvprsdi=-1;
         var atvprsdi=-1;
-	    var canprintout=typeof prsng.print === "function";
-	    var owner=typeof prsng.owner === "object" ? prsng.owner:null;
+	    var canprintout=typeof callprsng().print === "function";
+	    var owner=typeof callprsng().owner === "object" ? callprsng().owner:null;
 	    var print=function(prntthis) {
             if (canprintout && typeof prntthis === "string" && prntthis!=="") {
                 passive+=prntthis;
             }       
 	    }
-        var altFlushPassive=typeof prsng.flushpassive === "function"?prsng.flushpassive:null;
+        var altFlushPassive=typeof callprsng().flushpassive === "function"?callprsng().flushpassive:null;
         var altFlushPassiveResult=null;
-        var altFlushActive=typeof prsng.flushactive === "function"?prsng.flushactive:null;
+        var altFlushActive=typeof callprsng().flushactive === "function"?callprsng().flushactive:null;
         var altFlushActiveResult=null;
-        var altEvalActive=typeof prsng.evalactive === "function"?prsng.evalactive:null;
+        var altEvalActive=typeof callprsng().evalactive === "function"?callprsng().evalactive:null;
         var stillvalid=true;
 
 	    function iterateString(prsgn,stringtoiterate,functoprsr) {
@@ -60,12 +68,12 @@
 	    var endi=0;
 	    var content=[];
 
-	    if (typeof prsng.beglbl!=="string") {
-		    prsng["beglbl"]="[@";
+	    if (typeof callprsng().beglbl!=="string" && typeof callprsng().beglbl!=="function") {
+		    callprsng()["beglbl"]="[@";
 	    }
 
-	    if (typeof prsng.endlbl!=="string") {
-		    prsng["endlbl"]="@]";
+	    if (typeof callprsng().endlbl!=="string" && typeof callprsng().endlbl!=="function") {
+		    callprsng()["endlbl"]="@]";
 	    }
 
 	    function flushPassive(prsng){
@@ -130,20 +138,34 @@
                 tmpcode="";
             }
 	    }
+
+        function beglbl(prsng) {
+            if (typeof prsng.beglbl=== "function") {
+                return prsng.beglbl()
+            }
+            return prsng.beglbl;
+        }
+
+        function endlbl(prsng) {
+            if (typeof prsng.endlbl=== "function") {
+                return prsng.endlbl()
+            }
+            return prsng.endlbl;
+        }
 	    
 	    function parsechr(prsng,chr) {
-            if (endi==0 && begi<prsng.beglbl.length) {
+            if (endi==0 && begi<beglbl(prsng).length) {
                 if (psvprsdi==-1) {
                     psvprsdi=unsprsdln;
                 }
-                if (begi>0 && prsng.beglbl[begi-1]==prvc && prsng.beglbl[begi]!==chr) {
+                if (begi>0 && beglbl(prsng)[begi-1]==prvc && beglbl(prsng)[begi]!==chr) {
                 var bi=begi;
                 begi=0;
-                iterateString(prsng,prsng.beglbl.substring(0,bi),parsePsvChar);
+                iterateString(prsng,beglbl(prsng).substring(0,bi),parsePsvChar);
                 }
-                if (prsng.beglbl[begi]===chr) {
+                if (beglbl(prsng)[begi]===chr) {
                 begi++;
-                if (begi===prsng.beglbl.length){
+                if (begi===beglbl(prsng).length){
                     prvc="";
                     prvc="";
                 } else {
@@ -153,17 +175,17 @@
                 if (begi>0) {
                     var bi=begi;
                     begi=0;
-                    iterateString(prsng,prsng.beglbl.substring(0,bi),parsePsvChar);
+                    iterateString(prsng,beglbl(prsng).substring(0,bi),parsePsvChar);
                 }
                 parsePsvChar(prsng, prvc=chr);
                 }
-            } else if (begi==prsng.beglbl.length && endi<prsng.endlbl.length) {
+            } else if (begi==beglbl(prsng).length && endi<endlbl(prsng).length) {
                 if (atvprsdi==-1) {
                     atvprsdi=unsprsdln;
                 }
-                if (prsng.endlbl[endi]===chr) {
+                if (endlbl(prsng)[endi]===chr) {
                     endi++;
-                        if (endi===prsng.endlbl.length){
+                        if (endi===endlbl(prsng).length){
                             begi=0;
                             endi=0;
                             prvc="";
@@ -172,17 +194,17 @@
                     if (endi>0) {
                         var bi=endi;
                         endi=0;
-                        iterateString(prsng,prsng.endlbl.substring(0,bi),parseCodeChar);
+                        iterateString(prsng,endlbl(prsng).substring(0,bi),parseCodeChar);
                     }
                     parseCodeChar(prsng, chr);
                 }
             }
         }
 
-	    iterateString(prsng,unparsedcontent,parsechr);
+	    iterateString(callprsng(),unparsedcontent,parsechr);
 	    
-	    flushPassive(prsng); 
-	    flushCode(prsng);
+	    flushPassive(callprsng()); 
+	    flushCode(callprsng());
 	    if (foundCode && code!="") {
             if (altEvalActive!=null && typeof altEvalActive === "function") {
                 altEvalActive(code);
@@ -193,12 +215,12 @@
 
 	    if (passive!=="") {
             if (canprintout){
-                prsng.print(passive);
+                callprsng().print(passive);
             }
 	    }
 
-	    if (typeof prsng.endParsing === "function") {
-		    prsng.endParsing();
+	    if (typeof callprsng().endParsing === "function") {
+		    callprsng().endParsing();
 	    }
 	}
 	return parseActivePassive;
